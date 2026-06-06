@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Control Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="padding: 50px 5%; align-items: center;">
+    
+    <div style="width: 100%; max-width: 800px;">
+        <h1 style="color: var(--neon-teal); margin-bottom: 10px;">Control Center</h1>
+        <p style="color: var(--text-muted); margin-bottom: 30px;">Note: Saving changes here requires database integration to be applied to the live site.</p>
+        
+        <div class="card card-teal reveal" style="width: 100%;">
+            <form onsubmit="alert('Settings saved locally. Connect a database to make this live.'); return false;">
+                
+                <label style="display:block; margin-bottom: 5px; font-weight: bold;">Update Daily Verse (Text):</label>
+                <input type="text" placeholder="Enter new verse text" style="width: 100%; padding: 10px; margin-bottom: 15px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
+
+                <label style="display:block; margin-bottom: 5px; font-weight: bold;">Update Daily Verse (Reference):</label>
+                <input type="text" placeholder="e.g. John 3:16" style="width: 100%; padding: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
+
+                <label style="display:block; margin-bottom: 5px; font-weight: bold;">Update Timings:</label>
+                <textarea rows="3" style="width: 100%; padding: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">Sunday: 6:30 AM - 8:00 AM & 8:00 AM - 11:00 AM</textarea>
+
+                <label style="display:block; margin-bottom: 5px; font-weight: bold;">YouTube Channel Link:</label>
+                <input type="text" value="https://www.youtube.com/@IpaChurchInElappara" style="width: 100%; padding: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
+
+                <label style="display:block; margin-bottom: 5px; font-weight: bold;">Location / Address:</label>
+                <input type="text" value="IPA Church Elappara Idukki Kerala India" style="width: 100%; padding: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
+
+                <button type="submit" class="btn-gradient" style="border: none; cursor: pointer; display: inline-block; margin-right: 15px;">Save All Changes</button>
+                <a href="index.html" class="btn-outline">Exit Control</a>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

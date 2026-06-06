@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>connect,grow,serve,belong</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="padding: 50px 5%;">
+    <a href="index.html" class="btn-outline" style="margin-bottom: 30px; display: inline-block;">Back to Home</a>
+    
+    <h1 style="color: var(--neon-blue); margin-bottom: 20px; text-transform: uppercase;">connect,grow,serve,belong</h1>
+    
+    <div class="card card-blue reveal" style="max-width: 800px; margin-bottom: 40px;">
+        <h3>SERVE</h3>
+        <p>Serving is an expression of God's love in action. We encourage every believer to use their God-given gifts and talents to glorify Christ, strengthen the church, and impact the community. Together, we serve with compassion, humility, and a desire to make Jesus known.</p>
+    </div>
+
+    <div class="card reveal" style="max-width: 800px;">
+        <h3 style="margin-bottom: 15px;">Leave a Comment</h3>
+        <form onsubmit="alert('Comment submitted! (Requires backend to save)'); return false;">
+            <input type="text" placeholder="Your Name" required style="width: 100%; padding: 10px; margin-bottom: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
+            <textarea rows="4" placeholder="Your Comment..." required style="width: 100%; padding: 10px; margin-bottom: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;"></textarea>
+            <button type="submit" class="btn-gradient" style="border: none; cursor: pointer;">Post Comment</button>
+        </form>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
