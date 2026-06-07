@@ -10,25 +10,25 @@
     
     <div style="width: 100%; max-width: 800px;">
         <h1 style="color: var(--neon-teal); margin-bottom: 10px;">Control Center</h1>
-        <p style="color: var(--text-muted); margin-bottom: 30px;">Note: Saving changes here updates the live production website database instantly.</p>
+        <p style="color: var(--text-muted); margin-bottom: 30px;">Authorized Access Only. Settings adjust live configurations automatically across client endpoints.</p>
         
         <div class="card card-teal reveal" style="width: 100%;">
             <form id="admin-control-form">
                 
                 <label style="display:block; margin-bottom: 5px; font-weight: bold;">Update Daily Verse (Text):</label>
-                <input type="text" id="admin-verse-text" placeholder="Enter new verse text" style="width: 100%; padding: 10px; margin-bottom: 15px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
+                <input type="text" id="custom-verse-text" placeholder="Enter custom verse override (Leave blank to use default script rotation)" style="width: 100%; padding: 10px; margin-bottom: 15px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
 
                 <label style="display:block; margin-bottom: 5px; font-weight: bold;">Update Daily Verse (Reference):</label>
-                <input type="text" id="admin-verse-ref" placeholder="e.g. John 3:16" style="width: 100%; padding: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
+                <input type="text" id="custom-verse-ref" placeholder="e.g. John 3:16" style="width: 100%; padding: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
 
                 <label style="display:block; margin-bottom: 5px; font-weight: bold;">Update Timings:</label>
-                <textarea id="admin-timings" rows="3" style="width: 100%; padding: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">Sunday: 6:30 AM - 8:00 AM & 8:00 AM - 11:00 AM</textarea>
+                <textarea id="custom-timings" rows="3" style="width: 100%; padding: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">Sunday: 6:30 AM - 8:00 AM & 8:00 AM - 11:00 AM</textarea>
 
                 <label style="display:block; margin-bottom: 5px; font-weight: bold;">YouTube Channel Link:</label>
-                <input type="text" id="admin-youtube" value="https://www.youtube.com/@IpaChurchInElappara" style="width: 100%; padding: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
+                <input type="text" id="custom-youtube" value="https://www.youtube.com/@IpaChurchInElappara" style="width: 100%; padding: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
 
                 <label style="display:block; margin-bottom: 5px; font-weight: bold;">Location / Address:</label>
-                <input type="text" id="admin-location" value="IPA Church Elappara Idukki Kerala India" style="width: 100%; padding: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
+                <input type="text" id="custom-address" value="IPA Church Elappara Idukki Kerala India" style="width: 100%; padding: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
 
                 <button type="submit" class="btn-gradient" style="border: none; cursor: pointer; display: inline-block; margin-right: 15px;">Save All Changes</button>
                 <a href="index.html" class="btn-outline">Exit Control</a>
@@ -36,13 +36,10 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
-    
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
     <script>
-      // 1. Insert your exact Firebase web config object keys here
       const firebaseConfig = {
         apiKey: "YOUR_API_KEY",
         authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -54,39 +51,45 @@
 
       firebase.initializeApp(firebaseConfig);
       const db = firebase.firestore();
+      const documentReference = db.collection("church_settings").doc("live_data");
 
-      // AUTO-LOAD: Load existing values from the database document upon entry
-      db.collection("church_settings").doc("live_data").get().then((doc) => {
+      // 1. Initial Document Fetcher to populate fields with current live status
+      documentReference.get().then((doc) => {
         if (doc.exists) {
-          const data = doc.data();
-          if (data.dailyVerse) document.getElementById("admin-verse-text").value = data.dailyVerse;
-          if (data.dailyVerseRef) document.getElementById("admin-verse-ref").value = data.dailyVerseRef;
-          if (data.timings) document.getElementById("admin-timings").value = data.timings;
-          if (data.youtubeLink) document.getElementById("admin-youtube").value = data.youtubeLink;
-          if (data.locationAddress) document.getElementById("admin-location").value = data.locationAddress;
+          const currentSettings = doc.data();
+          if (currentSettings.verseText) document.getElementById("custom-verse-text").value = currentSettings.verseText;
+          if (currentSettings.verseRef) document.getElementById("custom-verse-ref").value = currentSettings.verseRef;
+          if (currentSettings.timings) document.getElementById("custom-timings").value = currentSettings.timings;
+          if (currentSettings.youtubeLink) document.getElementById("custom-youtube").value = currentSettings.youtubeLink;
+          if (currentSettings.locationAddress) document.getElementById("custom-address").value = currentSettings.locationAddress;
         }
-      }).catch((error) => console.error("Error fetching setup values:", error));
+      }).catch((err) => {
+         console.error("Initial data loading fault:", err);
+      });
 
-      // SAVE: Intercept form submission to save ALL data live to Firebase
-      document.getElementById("admin-control-form").addEventListener("submit", async (e) => {
-        e.preventDefault(); // Stops the browser from refreshing the page
+      // 2. Stream Data Updates Back to Firestore Document
+      document.getElementById("admin-control-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        
+        const packagePayload = {
+          verseText: document.getElementById("custom-verse-text").value.trim(),
+          verseRef: document.getElementById("custom-verse-ref").value.trim(),
+          timings: document.getElementById("custom-timings").value.trim(),
+          youtubeLink: document.getElementById("custom-youtube").value.trim(),
+          locationAddress: document.getElementById("custom-address").value.trim()
+        };
 
-        try {
-          // Overwrites or updates the document tracking the settings
-          await db.collection("church_settings").doc("live_data").set({
-            dailyVerse: document.getElementById("admin-verse-text").value,
-            dailyVerseRef: document.getElementById("admin-verse-ref").value,
-            timings: document.getElementById("admin-timings").value,
-            youtubeLink: document.getElementById("admin-youtube").value,
-            locationAddress: document.getElementById("admin-location").value
-          }, { merge: true });
-
-          alert("🎉 Glory! Changes successfully saved to your live website database.");
-        } catch (error) {
-          console.error("Error updating Firebase:", error);
-          alert("Oops! Something went wrong. Check your browser console log.");
-        }
+        documentReference.set(packagePayload, { merge: true })
+          .then(() => {
+             alert("All changes successfully saved to the live database!");
+          })
+          .catch((err) => {
+             console.error("Write error encountered:", err);
+             alert("Save Operation Aborted. Review administrative permissions and connection configurations.");
+          });
       });
     </script>
+
+    <script src="script.js"></script>
 </body>
 </html>
