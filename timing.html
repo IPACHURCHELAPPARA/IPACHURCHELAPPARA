@@ -23,8 +23,9 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    
     <script>
-      // Insert your exact Firebase web config object keys here
+      // 1. Insert your exact Firebase web config object keys here
       const firebaseConfig = {
         apiKey: "YOUR_API_KEY",
         authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -37,13 +38,16 @@
       firebase.initializeApp(firebaseConfig);
       const db = firebase.firestore();
 
+      // TIMINGS SYNC: Real-time synchronization stream for scheduling changes
       db.collection("church_settings").doc("live_data").onSnapshot((doc) => {
         const timingsContainer = document.getElementById("live-church-timings");
+        
         if (doc.exists && doc.data().timings) {
+          // Updates with custom string from control panel textarea
           timingsContainer.innerText = doc.data().timings;
         } else {
-          // Hardcoded backup template fallback
-          timingsContainer.innerHTML = `Sunday: 6:30 AM - 8:00 AM & 8:00 AM - 11:00 AM\nFriday: 10:00 AM (Fasting Prayer)\nFirst Saturday: 10:00 AM (Monthly Fasting Prayer)`;
+          // Hardcoded fallback template layout if document isn't populated yet
+          timingsContainer.innerText = "Sunday: 6:30 AM - 8:00 AM & 8:00 AM - 11:00 AM\nFriday: 10:00 AM (Fasting Prayer)\nFirst Saturday: 10:00 AM (Monthly Fasting Prayer)";
         }
       }, (error) => {
          console.error("Firebase read runtime mismatch:", error);
