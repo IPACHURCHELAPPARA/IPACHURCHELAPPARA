@@ -93,8 +93,9 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    
     <script>
-      // Insert your exact Firebase web config object keys here
+      // 1. Insert your exact Firebase web config object keys here
       const firebaseConfig = {
         apiKey: "YOUR_API_KEY",
         authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -117,7 +118,7 @@
           if (data.dailyVerseRef) document.getElementById("daily-verse-ref").innerText = data.dailyVerseRef;
           if (data.locationAddress) document.getElementById("footer-location-text").innerText = data.locationAddress;
           
-          // Sync live streaming paths
+          // Sync live streaming paths across Hero UI and Footer blocks
           if (data.youtubeLink) {
              const heroYt = document.getElementById("hero-youtube-link");
              const footerYt = document.getElementById("footer-youtube-link");
