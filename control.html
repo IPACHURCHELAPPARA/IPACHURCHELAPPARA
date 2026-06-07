@@ -10,7 +10,7 @@
     
     <div style="width: 100%; max-width: 800px;">
         <h1 style="color: var(--neon-teal); margin-bottom: 10px;">Control Center</h1>
-        <p style="color: var(--text-muted); margin-bottom: 30px;">Note: Saving changes here requires database integration to be applied to the live site.</p>
+        <p style="color: var(--text-muted); margin-bottom: 30px;">Note: Saving changes here updates the live production website database instantly.</p>
         
         <div class="card card-teal reveal" style="width: 100%;">
             <form id="admin-control-form">
@@ -42,7 +42,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
     <script>
-      // 2. Replace this placeholder configuration with YOUR actual keys from Firebase console
+      // Insert your exact Firebase web config object keys here
       const firebaseConfig = {
         apiKey: "YOUR_API_KEY",
         authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -52,11 +52,10 @@
         appId: "YOUR_APP_ID"
       };
 
-      // Initialize Firebase connection
       firebase.initializeApp(firebaseConfig);
       const db = firebase.firestore();
 
-      // AUTO-LOAD: Fetch existing values from Firebase when the page opens
+      // Load existing values from the database document upon entry
       db.collection("church_settings").doc("live_data").get().then((doc) => {
         if (doc.exists) {
           const data = doc.data();
@@ -66,37 +65,7 @@
           if (data.youtubeLink) document.getElementById("admin-youtube").value = data.youtubeLink;
           if (data.locationAddress) document.getElementById("admin-location").value = data.locationAddress;
         }
-      }).catch((error) => {
-        console.error("Error loading settings from database:", error);
-      });
+      }).catch((error) => console.error("Error fetching setup values:", error));
 
-      // SAVE: Intercept form submission to save ALL data live to Firebase
+      // Save form data into Cloud Firestore
       document.getElementById("admin-control-form").addEventListener("submit", async (e) => {
-        e.preventDefault(); // Stop the page from reloading
-
-        // Collect values from fields using their unique IDs
-        const verseText = document.getElementById("admin-verse-text").value;
-        const verseRef = document.getElementById("admin-verse-ref").value;
-        const timingsText = document.getElementById("admin-timings").value;
-        const youtubeUrl = document.getElementById("admin-youtube").value;
-        const locationText = document.getElementById("admin-location").value;
-
-        try {
-          // Save all variables under a single live document tracking settings
-          await db.collection("church_settings").doc("live_data").set({
-            dailyVerse: verseText,
-            dailyVerseRef: verseRef,
-            timings: timingsText,
-            youtubeLink: youtubeUrl,
-            locationAddress: locationText
-          }, { merge: true });
-
-          alert("🎉 Glory! Changes successfully saved to your live website database.");
-        } catch (error) {
-          console.error("Error updating Firebase:", error);
-          alert("Oops! Something went wrong. Check your console log.");
-        }
-      });
-    </script>
-</body>
-</html>
