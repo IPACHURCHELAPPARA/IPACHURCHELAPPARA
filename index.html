@@ -19,9 +19,10 @@
             </div>
         </a>
         <nav class="nav-links">
-    <a href="index.html" class="active">HOME</a>
-    <a href="about.html">ABOUT</a>
-</nav>
+            <a href="index.html" class="active">HOME</a>
+            <a href="about.html">ABOUT</a>
+            <a href="#">EVENTS</a>
+        </nav>
         <a href="visit.html" class="btn-outline">PLAN A VISIT</a>
     </header>
 
@@ -33,7 +34,7 @@
             
             <div class="hero-cta">
                 <a href="visit.html" class="btn-gradient"><i class="fa-solid fa-calendar-days"></i> PLAN A VISIT</a>
-                <a href="https://www.youtube.com/@IpaChurchInElappara" target="_blank" class="btn-text"><i class="fa-solid fa-circle-play"></i> WATCH MESSAGE</a>
+                <a href="https://www.youtube.com/@IpaChurchInElappara" id="hero-youtube-link" target="_blank" class="btn-text"><i class="fa-solid fa-circle-play"></i> WATCH MESSAGE</a>
             </div>
         </div>
     </main>
@@ -71,7 +72,7 @@
     <footer class="footer-bar">
         <div class="footer-item">
             <i class="fa-solid fa-location-dot"></i>
-            <span>IPA Church Elappara Idukki Kerala India</span>
+            <span id="footer-location-text">IPA Church Elappara Idukki Kerala India</span>
         </div>
         <div class="footer-item">
             <i class="fa-solid fa-clock"></i>
@@ -84,40 +85,47 @@
         <div class="footer-socials">
             <a href="#"><i class="fa-brands fa-instagram"></i></a>
             <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
-            <a href="https://www.youtube.com/@IpaChurchInElappara" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+            <a href="https://www.youtube.com/@IpaChurchInElappara" id="footer-youtube-link" target="_blank"><i class="fa-brands fa-youtube"></i></a>
         </div>
     </footer>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-<script>
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
-  // Listen to live database changes and inject them onto the homepage elements
-  db.collection("church_settings").doc("live_data").onSnapshot((doc) => {
-    if (doc.exists) {
-      const data = doc.data();
-      
-      // Update Daily Verse text if it exists in your HTML
-      const textEl = document.getElementById("daily-verse-text");
-      if (textEl && data.dailyVerse) {
-        textEl.innerText = `"${data.dailyVerse}"`;
-      }
-    }
-  });
-</script>
-
-<script src="script.js"></script>
     <script src="script.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script>
+      // Insert your exact Firebase web config object keys here
+      const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT_ID.appspot.com",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+
+      // Dynamic Live Database Synchronizer
+      db.collection("church_settings").doc("live_data").onSnapshot((doc) => {
+        if (doc.exists) {
+          const data = doc.data();
+          
+          // Override text content if configured in Admin Panel
+          if (data.dailyVerse) document.getElementById("daily-verse-text").innerText = data.dailyVerse;
+          if (data.dailyVerseRef) document.getElementById("daily-verse-ref").innerText = data.dailyVerseRef;
+          if (data.locationAddress) document.getElementById("footer-location-text").innerText = data.locationAddress;
+          
+          // Sync live streaming paths
+          if (data.youtubeLink) {
+             const heroYt = document.getElementById("hero-youtube-link");
+             const footerYt = document.getElementById("footer-youtube-link");
+             if (heroYt) heroYt.href = data.youtubeLink;
+             if (footerYt) footerYt.href = data.youtubeLink;
+          }
+        }
+      });
+    </script>
 </body>
 </html>
