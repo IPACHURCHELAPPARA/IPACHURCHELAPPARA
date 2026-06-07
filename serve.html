@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>connect,grow,serve,belong</title>
+    <title>Serve - IPA Church</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -16,14 +16,93 @@
         <p>Serving is an expression of God's love in action. We encourage every believer to use their God-given gifts and talents to glorify Christ, strengthen the church, and impact the community. Together, we serve with compassion, humility, and a desire to make Jesus known.</p>
     </div>
 
-    <div class="card reveal" style="max-width: 800px;">
+    <div class="card reveal" style="max-width: 800px; margin-bottom: 40px;">
         <h3 style="margin-bottom: 15px;">Leave a Comment</h3>
-        <form onsubmit="alert('Comment submitted! (Requires backend to save)'); return false;">
-            <input type="text" placeholder="Your Name" required style="width: 100%; padding: 10px; margin-bottom: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
-            <textarea rows="4" placeholder="Your Comment..." required style="width: 100%; padding: 10px; margin-bottom: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;"></textarea>
-            <button type="submit" class="btn-gradient" style="border: none; cursor: pointer;">Post Comment</button>
+        <form id="comment-form">
+            <input type="text" id="comment-name" placeholder="Your Name" required style="width: 100%; padding: 10px; margin-bottom: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
+            <textarea rows="4" id="comment-text" placeholder="Your Comment..." required style="width: 100%; padding: 10px; margin-bottom: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;"></textarea>
+            <button type="submit" class="btn-gradient" style="border: none; cursor: pointer; padding: 10px 20px; border-radius: 5px;">Post Comment</button>
         </form>
     </div>
+
+    <div style="max-width: 800px;">
+        <h2 style="color: var(--text-muted); font-size: 1.2rem; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">Serve Feed</h2>
+        <div id="comments-stream">
+            <p style="color: var(--text-muted); font-style: italic;">Loading community messages...</p>
+        </div>
+    </div>
+
     <script src="script.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    
+    <script>
+      // 1. Insert your exact Firebase web config object keys here
+      const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT_ID.appspot.com",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+
+      // SUBMIT EVENT: Save user comments securely into the database
+      document.getElementById("comment-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const nameInput = document.getElementById("comment-name");
+        const textInput = document.getElementById("comment-text");
+
+        try {
+          // Saving to a unique collection so serve data stays isolated
+          await db.collection("serve_comments").add({
+            name: nameInput.value,
+            comment: textInput.value,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+          // Clear inputs on successful submission
+          nameInput.value = "";
+          textInput.value = "";
+        } catch (error) {
+          console.error("Firestore Upload Error:", error);
+          alert("Could not post comment. Confirm your database security rules are active.");
+        }
+      });
+
+      // STREAM SYNC: Listen real-time to display fresh user comments instantly
+      db.collection("serve_comments").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+        const streamContainer = document.getElementById("comments-stream");
+        streamContainer.innerHTML = ""; // Clear loading indicators
+
+        if (snapshot.empty) {
+            streamContainer.innerHTML = `<p style="color: var(--text-muted); font-style: italic;">No entries yet. Be the first to share how you'd like to get involved!</p>`;
+            return;
+        }
+
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          
+          const commentCard = document.createElement("div");
+          commentCard.className = "card";
+          commentCard.style.marginBottom = "15px";
+          commentCard.style.padding = "20px";
+          commentCard.style.borderLeft = "4px solid var(--neon-blue)"; // Styled to match page theme
+          
+          commentCard.innerHTML = `
+            <strong style="color: var(--neon-blue); display: block; margin-bottom: 5px;">${data.name || 'Anonymous User'}</strong>
+            <p style="color: #ffffff; margin: 0; line-height: 1.5;">${data.comment || ''}</p>
+          `;
+          streamContainer.appendChild(commentCard);
+        });
+      }, (err) => {
+         console.error("Stream access error:", err);
+      });
+    </script>
 </body>
 </html>
