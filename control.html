@@ -37,5 +37,45 @@
     </div>
 
     <script src="script.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<script>
+  // 2. Replace this placeholder configuration with YOUR actual keys from Firebase console
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  // Initialize Firebase connection
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  // 3. Intercept form submission to save data live to Firebase
+  document.querySelector("form").addEventListener("submit", async (e) => {
+    e.preventDefault(); // Stop the page from reloading
+
+    // Find the input fields based on placeholders in your HTML
+    const verseInput = document.querySelector('input[placeholder="Enter new verse text"]').value;
+    const timingInput = document.querySelector('textarea').value;
+
+    try {
+      // Save data under a collection called 'church_settings' and document called 'live_data'
+      await db.collection("church_settings").doc("live_data").set({
+        dailyVerse: verseInput,
+        timings: timingInput
+      }, { merge: true });
+
+      alert("🎉 Glory! Changes successfully saved to your live website database.");
+    } catch (error) {
+      console.error("Error updating Firebase:", error);
+      alert("Oops! Something went wrong. Check your console log.");
+    }
+  });
+</script>
 </body>
 </html>
