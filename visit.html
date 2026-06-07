@@ -12,7 +12,12 @@
         <h1 style="color: var(--neon-blue); font-size: 3rem; margin-bottom: 20px;">Plan A Visit</h1>
         <div class="card card-blue reveal" style="max-width: 600px; margin: 0 auto; text-align: left;">
             <h3 style="margin-bottom: 20px;">Contact Information</h3>
-            <p><strong>Address:</strong><br>IPA Church Santhi Nagar,<br>Elappara, Kerala 685501</p>
+            
+            <p>
+                <strong>Address:</strong><br>
+                <span id="visit-address-text" style="white-space: pre-line;">Loading live address...</span>
+            </p>
+            
             <p><strong>Phone Numbers:</strong><br>+91 9447687442<br>+91 9446137925<br>04869299492</p>
             <p><strong>Email:</strong><br>felixelappara@gmail.com</p>
             <br>
@@ -21,5 +26,39 @@
     </div>
 
     <script src="script.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    
+    <script>
+      // 1. Insert your exact Firebase web config object keys here
+      const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT_ID.appspot.com",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+
+      // ADDRESS SYNC: Real-time synchronization stream for location changes
+      db.collection("church_settings").doc("live_data").onSnapshot((doc) => {
+        const addressContainer = document.getElementById("visit-address-text");
+        
+        if (doc.exists && doc.data().locationAddress) {
+          // Updates automatically when changed from the Control Center
+          addressContainer.innerText = doc.data().locationAddress;
+        } else {
+          // Hardcoded backup fallback template layout
+          addressContainer.innerHTML = "IPA Church Santhi Nagar,<br>Elappara, Kerala 685501";
+        }
+      }, (error) => {
+         console.error("Firebase read runtime mismatch:", error);
+         document.getElementById("visit-address-text").innerHTML = "IPA Church Santhi Nagar,<br>Elappara, Kerala 685501";
+      });
+    </script>
 </body>
 </html>
