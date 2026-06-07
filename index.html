@@ -34,7 +34,7 @@
             
             <div class="hero-cta">
                 <a href="visit.html" class="btn-gradient"><i class="fa-solid fa-calendar-days"></i> PLAN A VISIT</a>
-                <a href="https://www.youtube.com/@IpaChurchInElappara" id="hero-youtube-link" target="_blank" class="btn-text"><i class="fa-solid fa-circle-play"></i> WATCH MESSAGE</a>
+                <a href="https://www.youtube.com/@IpaChurchInElappara" target="_blank" class="btn-text" id="hero-youtube-link"><i class="fa-solid fa-circle-play"></i> WATCH MESSAGE</a>
             </div>
         </div>
     </main>
@@ -72,7 +72,7 @@
     <footer class="footer-bar">
         <div class="footer-item">
             <i class="fa-solid fa-location-dot"></i>
-            <span id="footer-location-text">IPA Church Elappara Idukki Kerala India</span>
+            <span id="footer-address-text">IPA Church Elappara Idukki Kerala India</span>
         </div>
         <div class="footer-item">
             <i class="fa-solid fa-clock"></i>
@@ -85,7 +85,7 @@
         <div class="footer-socials">
             <a href="#"><i class="fa-brands fa-instagram"></i></a>
             <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
-            <a href="https://www.youtube.com/@IpaChurchInElappara" id="footer-youtube-link" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+            <a href="https://www.youtube.com/@IpaChurchInElappara" target="_blank" id="footer-youtube-link"><i class="fa-brands fa-youtube"></i></a>
         </div>
     </footer>
 
@@ -95,7 +95,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     
     <script>
-      // 1. Insert your exact Firebase web config object keys here
       const firebaseConfig = {
         apiKey: "YOUR_API_KEY",
         authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -108,24 +107,33 @@
       firebase.initializeApp(firebaseConfig);
       const db = firebase.firestore();
 
-      // Dynamic Live Database Synchronizer
+      // GLOBAL CONTENT RECEIVER: Streams custom text updates directly onto home screens
       db.collection("church_settings").doc("live_data").onSnapshot((doc) => {
         if (doc.exists) {
           const data = doc.data();
           
-          // Override text content if configured in Admin Panel
-          if (data.dailyVerse) document.getElementById("daily-verse-text").innerText = data.dailyVerse;
-          if (data.dailyVerseRef) document.getElementById("daily-verse-ref").innerText = data.dailyVerseRef;
-          if (data.locationAddress) document.getElementById("footer-location-text").innerText = data.locationAddress;
+          // 1. Custom Verse Override check (Falls back safely to script rotation if blank)
+          if (data.verseText && data.verseRef) {
+            document.getElementById("daily-verse-text").innerText = data.verseText;
+            document.getElementById("daily-verse-ref").innerText = data.verseRef;
+          }
           
-          // Sync live streaming paths across Hero UI and Footer blocks
+          // 2. Dynamic Video Sync
           if (data.youtubeLink) {
-             const heroYt = document.getElementById("hero-youtube-link");
-             const footerYt = document.getElementById("footer-youtube-link");
-             if (heroYt) heroYt.href = data.youtubeLink;
-             if (footerYt) footerYt.href = data.youtubeLink;
+            const heroYoutube = document.getElementById("hero-youtube-link");
+            const footerYoutube = document.getElementById("footer-youtube-link");
+            if (heroYoutube) heroYoutube.href = data.youtubeLink;
+            if (footerYoutube) footerYoutube.href = data.youtubeLink;
+          }
+          
+          // 3. Global Address Sync
+          if (data.locationAddress) {
+            const footerAddress = document.getElementById("footer-address-text");
+            if (footerAddress) footerAddress.innerText = data.locationAddress;
           }
         }
+      }, (error) => {
+         console.error("Firebase dashboard reading runtime mismatch:", error);
       });
     </script>
 </body>
