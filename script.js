@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // 1. Dynamic Navbar Scroll Effect
     const navbar = document.querySelector(".navbar");
-    if(navbar) {
+    if (navbar) {
         window.addEventListener("scroll", () => {
             if (window.scrollY > 50) {
                 navbar.classList.add("navbar-scrolled");
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("scroll", revealOnScroll);
     revealOnScroll(); // Trigger immediately for items already in view
 
-    // 3. Daily Bible Verses Logic
+    // 3. Daily Bible Verses Logic (Automatic Native Backup Rotation)
     const verses = [
         { text: `"For God so loved the world, that he gave his only Son..."`, ref: "John 3:16" },
         { text: `"I can do all things through him who strengthens me."`, ref: "Philippians 4:13" },
@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const verseRefEl = document.getElementById("daily-verse-ref");
 
     if (verseTextEl && verseRefEl) {
-        // Use the day of the year to pick a consistent daily verse
+        // Calculates a structured, consistent verse based on calendar tracking day of the year
         const now = new Date();
         const start = new Date(now.getFullYear(), 0, 0);
         const diff = now - start;
@@ -53,9 +53,9 @@ document.addEventListener("DOMContentLoaded", () => {
         verseRefEl.innerText = verses[verseIndex].ref;
     }
 
-    // 4. Control Panel Password Lock
+    // 4. Control Panel Password Lock System
     const controlBtn = document.getElementById("control-panel-btn");
-    if(controlBtn) {
+    if (controlBtn) {
         controlBtn.addEventListener("click", () => {
             const pass = prompt("Enter Administration Password:");
             if (pass === "8618317572@timon") {
