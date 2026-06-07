@@ -13,7 +13,7 @@
         <div class="card card-purple reveal" style="max-width: 600px; margin: 0 auto; text-align: left;">
             
             <div id="live-church-timings" style="white-space: pre-line; color: #fff; line-height: 2; font-size: 1.1rem;">
-                Loading live timings...
+                Loading live schedules...
             </div>
             
             <br>
@@ -23,10 +23,8 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
     <script>
-      // 2. YOUR FIREBASE CONFIGURATION
-      // Replace these placeholders with the actual project keys from your Firebase Console dashboard
+      // Insert your exact Firebase web config object keys here
       const firebaseConfig = {
         apiKey: "YOUR_API_KEY",
         authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -36,24 +34,20 @@
         appId: "YOUR_APP_ID"
       };
 
-      // Initialize Firebase Connection
       firebase.initializeApp(firebaseConfig);
       const db = firebase.firestore();
 
-      // 3. Real-time Database Listener
-      // Automatically listens to edits made inside control.html and refreshes the text instantly
       db.collection("church_settings").doc("live_data").onSnapshot((doc) => {
         const timingsContainer = document.getElementById("live-church-timings");
-        
         if (doc.exists && doc.data().timings) {
           timingsContainer.innerText = doc.data().timings;
         } else {
-          // Fallback default text if the database document hasn't been created yet
-          timingsContainer.innerHTML = `<strong>Sunday:</strong> 6:30 AM - 8:00 AM & 8:00 AM - 11:00 AM\n<strong>Friday:</strong> 10:00 AM (Fasting Prayer)\n<strong>First Saturday:</strong> 10:00 AM (Monthly Fasting Prayer)`;
+          // Hardcoded backup template fallback
+          timingsContainer.innerHTML = `Sunday: 6:30 AM - 8:00 AM & 8:00 AM - 11:00 AM\nFriday: 10:00 AM (Fasting Prayer)\nFirst Saturday: 10:00 AM (Monthly Fasting Prayer)`;
         }
       }, (error) => {
-         console.error("Firebase fetch error: ", error);
-         document.getElementById("live-church-timings").innerText = "Failed to load schedules. Please check connection.";
+         console.error("Firebase read runtime mismatch:", error);
+         document.getElementById("live-church-timings").innerText = "Unable to download current timeline configurations.";
       });
     </script>
 
