@@ -13,22 +13,22 @@
         <p style="color: var(--text-muted); margin-bottom: 30px;">Note: Saving changes here requires database integration to be applied to the live site.</p>
         
         <div class="card card-teal reveal" style="width: 100%;">
-            <form onsubmit="alert('Settings saved locally. Connect a database to make this live.'); return false;">
+            <form id="admin-control-form">
                 
                 <label style="display:block; margin-bottom: 5px; font-weight: bold;">Update Daily Verse (Text):</label>
-                <input type="text" placeholder="Enter new verse text" style="width: 100%; padding: 10px; margin-bottom: 15px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
+                <input type="text" id="admin-verse-text" placeholder="Enter new verse text" style="width: 100%; padding: 10px; margin-bottom: 15px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
 
                 <label style="display:block; margin-bottom: 5px; font-weight: bold;">Update Daily Verse (Reference):</label>
-                <input type="text" placeholder="e.g. John 3:16" style="width: 100%; padding: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
+                <input type="text" id="admin-verse-ref" placeholder="e.g. John 3:16" style="width: 100%; padding: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
 
                 <label style="display:block; margin-bottom: 5px; font-weight: bold;">Update Timings:</label>
-                <textarea rows="3" style="width: 100%; padding: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">Sunday: 6:30 AM - 8:00 AM & 8:00 AM - 11:00 AM</textarea>
+                <textarea id="admin-timings" rows="3" style="width: 100%; padding: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">Sunday: 6:30 AM - 8:00 AM & 8:00 AM - 11:00 AM</textarea>
 
                 <label style="display:block; margin-bottom: 5px; font-weight: bold;">YouTube Channel Link:</label>
-                <input type="text" value="https://www.youtube.com/@IpaChurchInElappara" style="width: 100%; padding: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
+                <input type="text" id="admin-youtube" value="https://www.youtube.com/@IpaChurchInElappara" style="width: 100%; padding: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
 
                 <label style="display:block; margin-bottom: 5px; font-weight: bold;">Location / Address:</label>
-                <input type="text" value="IPA Church Elappara Idukki Kerala India" style="width: 100%; padding: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
+                <input type="text" id="admin-location" value="IPA Church Elappara Idukki Kerala India" style="width: 100%; padding: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; border-radius: 5px;">
 
                 <button type="submit" class="btn-gradient" style="border: none; cursor: pointer; display: inline-block; margin-right: 15px;">Save All Changes</button>
                 <a href="index.html" class="btn-outline">Exit Control</a>
@@ -37,45 +37,66 @@
     </div>
 
     <script src="script.js"></script>
+    
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-<script>
-  // 2. Replace this placeholder configuration with YOUR actual keys from Firebase console
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
+    <script>
+      // 2. Replace this placeholder configuration with YOUR actual keys from Firebase console
+      const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT_ID.appspot.com",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
+      };
 
-  // Initialize Firebase connection
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
+      // Initialize Firebase connection
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
 
-  // 3. Intercept form submission to save data live to Firebase
-  document.querySelector("form").addEventListener("submit", async (e) => {
-    e.preventDefault(); // Stop the page from reloading
+      // AUTO-LOAD: Fetch existing values from Firebase when the page opens
+      db.collection("church_settings").doc("live_data").get().then((doc) => {
+        if (doc.exists) {
+          const data = doc.data();
+          if (data.dailyVerse) document.getElementById("admin-verse-text").value = data.dailyVerse;
+          if (data.dailyVerseRef) document.getElementById("admin-verse-ref").value = data.dailyVerseRef;
+          if (data.timings) document.getElementById("admin-timings").value = data.timings;
+          if (data.youtubeLink) document.getElementById("admin-youtube").value = data.youtubeLink;
+          if (data.locationAddress) document.getElementById("admin-location").value = data.locationAddress;
+        }
+      }).catch((error) => {
+        console.error("Error loading settings from database:", error);
+      });
 
-    // Find the input fields based on placeholders in your HTML
-    const verseInput = document.querySelector('input[placeholder="Enter new verse text"]').value;
-    const timingInput = document.querySelector('textarea').value;
+      // SAVE: Intercept form submission to save ALL data live to Firebase
+      document.getElementById("admin-control-form").addEventListener("submit", async (e) => {
+        e.preventDefault(); // Stop the page from reloading
 
-    try {
-      // Save data under a collection called 'church_settings' and document called 'live_data'
-      await db.collection("church_settings").doc("live_data").set({
-        dailyVerse: verseInput,
-        timings: timingInput
-      }, { merge: true });
+        // Collect values from fields using their unique IDs
+        const verseText = document.getElementById("admin-verse-text").value;
+        const verseRef = document.getElementById("admin-verse-ref").value;
+        const timingsText = document.getElementById("admin-timings").value;
+        const youtubeUrl = document.getElementById("admin-youtube").value;
+        const locationText = document.getElementById("admin-location").value;
 
-      alert("🎉 Glory! Changes successfully saved to your live website database.");
-    } catch (error) {
-      console.error("Error updating Firebase:", error);
-      alert("Oops! Something went wrong. Check your console log.");
-    }
-  });
-</script>
+        try {
+          // Save all variables under a single live document tracking settings
+          await db.collection("church_settings").doc("live_data").set({
+            dailyVerse: verseText,
+            dailyVerseRef: verseRef,
+            timings: timingsText,
+            youtubeLink: youtubeUrl,
+            locationAddress: locationText
+          }, { merge: true });
+
+          alert("🎉 Glory! Changes successfully saved to your live website database.");
+        } catch (error) {
+          console.error("Error updating Firebase:", error);
+          alert("Oops! Something went wrong. Check your console log.");
+        }
+      });
+    </script>
 </body>
 </html>
